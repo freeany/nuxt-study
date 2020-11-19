@@ -79,8 +79,8 @@
                 <li
                   class="page-item"
                   :class="{
-                    active: $route.query.offset
-                      ? item === $route.query.offset
+                    active: Number($route.query.page)
+                      ? item === Number($route.query.page)
                       : item === 1,
                   }"
                   v-for="(item, index) in pageData"
@@ -91,6 +91,7 @@
                       name: 'home',
                       query: {
                         page: item,
+                        tag: $route.query.tag
                       },
                     }"
                     class="page-link"
@@ -106,14 +107,18 @@
               <p>Popular Tags</p>
 
               <div class="tag-list">
-                <a href="" class="tag-pill tag-default">programming</a>
-                <a href="" class="tag-pill tag-default">javascript</a>
-                <a href="" class="tag-pill tag-default">emberjs</a>
-                <a href="" class="tag-pill tag-default">angularjs</a>
-                <a href="" class="tag-pill tag-default">react</a>
-                <a href="" class="tag-pill tag-default">mean</a>
-                <a href="" class="tag-pill tag-default">node</a>
-                <a href="" class="tag-pill tag-default">rails</a>
+                <nuxt-link
+                  v-for="tag in tagsResult"
+                  :key="tag"
+                  :to="{
+                    name: '',
+                    query: {
+                      tag: tag,
+                    },
+                  }"
+                  class="tag-pill tag-default"
+                  >{{ tag }}</nuxt-link
+                >
               </div>
             </div>
           </div>
@@ -123,42 +128,66 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { articleList } from '@/api/posts'
+import { mapState } from "vuex";
+import { articleList } from "@/api/posts";
+import { getTags } from "@/api/tags";
 export default {
-  name: 'HomePage',
-  async asyncData ({ query }) {
-    console.log('执行asyncData...')
-    let limit = 10
+  name: "HomePage",
+  async asyncData({ query }) {
+    console.log("执行asyncData...");
+    let limit = 10;
     // let offset = query.offset || 1
-    let offset = (query.page - 1) * limit // 这是跳过的数量
-    // 现在一个有10个，第一页limit是10， offset是0， 
+    let offset = (query.page - 1) * limit; // 这是跳过的数量
+    // 现在一个有10个，第一页limit是10， offset是0，
     // 如果第二页，那么limit是10， offset是10
     // 也就是 第n页 就是 (n-1)*limit
-    const { data: { articles, articlesCount } } = await articleList({
-      limit,
-      offset
-    })
+    let tag = query.tag;
+    // 可以对比下时间
+    // const {
+    //   data: { articles, articlesCount },
+    // } = await articleList({
+    //   limit,
+    //   offset,
+    //   tag,
+    // });
 
+    // const {
+    //   data: { tags },
+    // } = await getTags();
+
+    const [articleListResult, getTagsResult] = await Promise.all([
+      articleList({
+        limit,
+        offset,
+        tag,
+      }),
+      getTags(),
+    ]);
+    const {
+      data: { articles, articlesCount },
+    } = articleListResult;
+    const {
+      data: { tags },
+    } = getTagsResult;
+    const tagsResult = tags.filter((tag) => !!tag);
     return {
       articles,
       articlesCount,
       limit,
-      offset
-    }
+      offset,
+      tagsResult,
+    };
   },
+  watchQuery: ["page", "tag"], // 监听路由中query对象中的page。
   computed: {
-    ...mapState(['user']),
-    pageData () {
-      let arr = []
-      let num = Math.floor(this.articlesCount / this.limit)
-      for (let i = 1; i <= num; i++) {
-        arr.push(i)
-      }
-      return arr
-    }
-  }
-}
+    ...mapState(["user"]),
+    pageData() {
+      let arr = [];
+      let num = Math.ceil(this.articlesCount / this.limit);
+      return num;
+    },
+  },
+};
 </script>
 <style>
 </style>
