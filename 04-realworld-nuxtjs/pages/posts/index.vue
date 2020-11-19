@@ -7,7 +7,7 @@
         <div class="article-meta">
           <a href=""
             ><img
-              src="https://static.productionready.io/images/smiley-cyrus.jpg"
+              src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
           /></a>
           <div class="info">
             <a href="" class="author">Eric Simons</a>
@@ -44,7 +44,7 @@
         <div class="article-meta">
           <a href="profile.html"
             ><img
-              src="https://static.productionready.io/images/smiley-cyrus.jpg"
+              src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
           /></a>
           <div class="info">
             <a href="" class="author">Eric Simons</a>
@@ -75,7 +75,7 @@
             </div>
             <div class="card-footer">
               <img
-                src="https://static.productionready.io/images/smiley-cyrus.jpg"
+                src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
                 class="comment-author-img"
               />
               <button class="btn btn-sm btn-primary">Post Comment</button>
@@ -92,7 +92,7 @@
             <div class="card-footer">
               <a href="" class="comment-author">
                 <img
-                  src="https://static.productionready.io/images/smiley-cyrus.jpg"
+                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
                   class="comment-author-img"
                 />
               </a>
@@ -112,7 +112,7 @@
             <div class="card-footer">
               <a href="" class="comment-author">
                 <img
-                  src="https://static.productionready.io/images/smiley-cyrus.jpg"
+                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
                   class="comment-author-img"
                 />
               </a>
@@ -133,8 +133,7 @@
 
 <script>
 export default {
-  name: 'posts',
-  layout: 'index'
+  name: 'postsIndex'
 }
 </script>
 

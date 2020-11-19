@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-xs-12 col-md-10 offset-md-1">
             <img
-              src="https://static.productionready.io/images/smiley-cyrus.jpg"
+              src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
               class="user-img"
             />
             <h4>Eric Simons</h4>
@@ -40,7 +40,7 @@
             <div class="article-meta">
               <a href=""
                 ><img
-                  src="https://static.productionready.io/images/smiley-cyrus.jpg"
+                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
               /></a>
               <div class="info">
                 <a href="" class="author">Eric Simons</a>
@@ -61,7 +61,7 @@
             <div class="article-meta">
               <a href=""
                 ><img
-                  src="https://static.productionready.io/images/smiley-cyrus.jpg"
+                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
               /></a>
               <div class="info">
                 <a href="" class="author">Albert Pai</a>
@@ -92,7 +92,8 @@
 
 <script>
 export default {
-  layout: 'index'
+  name: 'profileIndex',
+  middleware: 'authenticated'
 }
 </script>
 

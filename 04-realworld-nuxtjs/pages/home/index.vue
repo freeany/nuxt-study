@@ -12,7 +12,7 @@
           <div class="col-md-9">
             <div class="feed-toggle">
               <ul class="nav nav-pills outline-active">
-                <li class="nav-item">
+                <li class="nav-item" v-if="user">
                   <a class="nav-link disabled" href="">Your Feed</a>
                 </li>
                 <li class="nav-item">
@@ -21,50 +21,84 @@
               </ul>
             </div>
 
-            <div class="article-preview">
+            <div
+              class="article-preview"
+              v-for="article in articles"
+              :key="article.slug"
+            >
               <div class="article-meta">
-                <a href="profile.html"
-                  ><img
-                    src="https://static.productionready.io/images/smiley-cyrus.jpg"
-                /></a>
+                <!-- 此nuxt-link为用户信息数据 -->
+                <nuxt-link
+                  :to="{
+                    name: 'profile',
+                    params: {
+                      username: article.author.username,
+                    },
+                  }"
+                  ><img :src="article.author.image"
+                /></nuxt-link>
                 <div class="info">
-                  <a href="" class="author">Eric Simons</a>
-                  <span class="date">January 20th</span>
+                  <nuxt-link
+                    :to="{
+                      name: 'profile',
+                      params: {
+                        username: article.author.username,
+                      },
+                    }"
+                    class="author"
+                    >{{ article.author.username }}</nuxt-link
+                  >
+                  <span class="date">{{ article.createdAt }}</span>
                 </div>
-                <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                  <i class="ion-heart"></i> 29
+                <button
+                  class="btn btn-outline-primary btn-sm pull-xs-right"
+                  :class="{
+                    active: article.favorited,
+                  }"
+                >
+                  <i class="ion-heart"></i> {{ article.favoritesCount }}
                 </button>
               </div>
-              <a href="" class="preview-link">
-                <h1>How to build webapps that scale</h1>
-                <p>This is the description for the post.</p>
+              <nuxt-link
+                :to="{
+                  name: 'posts',
+                  params: {
+                    slug: article.slug,
+                  },
+                }"
+                class="preview-link"
+              >
+                <h1>{{ article.title }}</h1>
+                <p>{{ article.description }}</p>
                 <span>Read more...</span>
-              </a>
+              </nuxt-link>
             </div>
 
-            <div class="article-preview">
-              <div class="article-meta">
-                <a href="profile.html"
-                  ><img
-                    src="https://static.productionready.io/images/smiley-cyrus.jpg"
-                /></a>
-                <div class="info">
-                  <a href="" class="author">Albert Pai</a>
-                  <span class="date">January 20th</span>
-                </div>
-                <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                  <i class="ion-heart"></i> 32
-                </button>
-              </div>
-              <a href="" class="preview-link">
-                <h1>
-                  The song you won't ever stop singing. No matter how hard you
-                  try.
-                </h1>
-                <p>This is the description for the post.</p>
-                <span>Read more...</span>
-              </a>
-            </div>
+            <nav>
+              <ul class="pagination">
+                <li
+                  class="page-item"
+                  :class="{
+                    active: $route.query.offset
+                      ? item === $route.query.offset
+                      : item === 1,
+                  }"
+                  v-for="(item, index) in pageData"
+                  :key="index"
+                >
+                  <nuxt-link
+                    :to="{
+                      name: 'home',
+                      query: {
+                        page: item,
+                      },
+                    }"
+                    class="page-link"
+                    >{{ item }}</nuxt-link
+                  >
+                </li>
+              </ul>
+            </nav>
           </div>
 
           <div class="col-md-3">
@@ -89,9 +123,41 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
+import { articleList } from '@/api/posts'
 export default {
   name: 'HomePage',
-  layout: 'index'
+  async asyncData ({ query }) {
+    console.log('执行asyncData...')
+    let limit = 10
+    // let offset = query.offset || 1
+    let offset = (query.page - 1) * limit // 这是跳过的数量
+    // 现在一个有10个，第一页limit是10， offset是0， 
+    // 如果第二页，那么limit是10， offset是10
+    // 也就是 第n页 就是 (n-1)*limit
+    const { data: { articles, articlesCount } } = await articleList({
+      limit,
+      offset
+    })
+
+    return {
+      articles,
+      articlesCount,
+      limit,
+      offset
+    }
+  },
+  computed: {
+    ...mapState(['user']),
+    pageData () {
+      let arr = []
+      let num = Math.floor(this.articlesCount / this.limit)
+      for (let i = 1; i <= num; i++) {
+        arr.push(i)
+      }
+      return arr
+    }
+  }
 }
 </script>
 <style>

@@ -8,21 +8,31 @@
             <!-- Add "active" class when you're on that page"  exact精确匹配-->
             <nuxt-link class="nav-link" exact to="/">Home</nuxt-link>
           </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/editor">
-              <i class="ion-compose"></i>&nbsp;New Post
+          <template v-if="user">
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/editor">
+                <i class="ion-compose"></i>&nbsp;New Post
+              </nuxt-link>
+            </li>
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/settings">
+                <i class="ion-gear-a"></i>&nbsp;Settings
+              </nuxt-link>
+            </li>
+          </template>
+          <template v-else>
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
+            </li>
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/register">Sign up</nuxt-link>
+            </li>
+          </template>
+          <li class="nav-item" v-if="user">
+            <nuxt-link class="nav-link" to="/profile/aa">
+              <img class="user-pic" :src="user.image" />
+              {{ user.username }}
             </nuxt-link>
-          </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/settings">
-              <i class="ion-gear-a"></i>&nbsp;Settings
-            </nuxt-link>
-          </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
-          </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/register">Sign up</nuxt-link>
           </li>
         </ul>
       </div>
@@ -42,7 +52,12 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
+  name: 'layoutsIndex',
+  computed: {
+    ...mapState(['user'])
+  }
 
 }
 </script>

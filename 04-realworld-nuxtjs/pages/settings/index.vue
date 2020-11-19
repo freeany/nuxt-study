@@ -55,7 +55,8 @@
 
 <script>
 export default {
-  layout: 'index'
+  name: 'settingsIndex',
+  middleware: 'authenticated'
 }
 </script>
 
