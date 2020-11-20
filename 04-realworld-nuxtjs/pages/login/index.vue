@@ -56,7 +56,7 @@
 
 <script>
 import { login, register } from '@/api/user'
-const Cookie = process.client ? require('js-cookie') : undefined
+import { setCookie } from '@/utils/cookie'
 export default {
   name: 'loginIndex',
   middleware: 'notAuthenticated',
@@ -76,7 +76,7 @@ export default {
       try {
         const { data } = this.isLogin ? await login({ user: { email, password } }) : await register({ user: this.user })
         this.$store.commit('setUser', data.user)
-        Cookie.set('user', JSON.stringify(data.user)) // saving token in cookie for server rendering
+        setCookie(data.user)
         this.$router.push('/')
       } catch (err) {
         this.errors = err.response.data.errors

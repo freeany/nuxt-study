@@ -13,10 +13,48 @@
             <div class="feed-toggle">
               <ul class="nav nav-pills outline-active">
                 <li class="nav-item" v-if="user">
-                  <a class="nav-link disabled" href="">Your Feed</a>
+                  <nuxt-link
+                    class="nav-link"
+                    :class="{ active: tab === 'my_feed' }"
+                    exact
+                    :to="{
+                      name: 'home',
+                      query: {
+                        tab: 'my_feed',
+                      },
+                    }"
+                    >Your Feed</nuxt-link
+                  >
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" href="">Global Feed</a>
+                  <nuxt-link
+                    class="nav-link"
+                    :class="{ active: tab === 'global_feed' }"
+                    exact
+                    :to="{
+                      name: 'home',
+                      query: {
+                        tab: 'global_feed',
+                      },
+                    }"
+                    >Global Feed</nuxt-link
+                  >
+                </li>
+
+                <li class="nav-item" v-if="tag">
+                  <nuxt-link
+                    class="nav-link"
+                    :class="{ active: tab === tag }"
+                    exact
+                    :to="{
+                      name: 'home',
+                      query: {
+                        tab: tag,
+                        tag: tag,
+                      },
+                    }"
+                    >#{{ tag }}</nuxt-link
+                  >
                 </li>
               </ul>
             </div>
@@ -48,17 +86,21 @@
                     class="author"
                     >{{ article.author.username }}</nuxt-link
                   >
-                  <span class="date">{{ article.createdAt }}</span>
+                  <span class="date">{{
+                    article.createdAt | date("MMM DD, YYYY")
+                  }}</span>
                 </div>
                 <button
                   class="btn btn-outline-primary btn-sm pull-xs-right"
                   :class="{
                     active: article.favorited,
                   }"
+                  @click="favorit(article)"
                 >
                   <i class="ion-heart"></i> {{ article.favoritesCount }}
                 </button>
               </div>
+              <!-- 此nuxt-link是posts 数据 -->
               <nuxt-link
                 :to="{
                   name: 'posts',
@@ -91,7 +133,8 @@
                       name: 'home',
                       query: {
                         page: item,
-                        tag: $route.query.tag
+                        tab: $route.query.tab,
+                        tag: $route.query.tag,
                       },
                     }"
                     class="page-link"
@@ -114,6 +157,7 @@
                     name: '',
                     query: {
                       tag: tag,
+                      tab: tag,
                     },
                   }"
                   class="tag-pill tag-default"
@@ -128,21 +172,21 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
-import { articleList } from "@/api/posts";
-import { getTags } from "@/api/tags";
+import { mapState } from 'vuex'
+import { articleList, articleFeedList, favorite, unfavorite } from '@/api/posts'
+import { getTags } from '@/api/tags'
 export default {
-  name: "HomePage",
-  async asyncData({ query }) {
-    console.log("执行asyncData...");
-    let limit = 10;
+  name: 'HomePage',
+  async asyncData ({ query }) {
+    const { page, tag, tab } = query
+    let limit = 10
     // let offset = query.offset || 1
-    let offset = (query.page - 1) * limit; // 这是跳过的数量
+    let offset = page && (page - 1) * limit // 这是跳过的数量
     // 现在一个有10个，第一页limit是10， offset是0，
     // 如果第二页，那么limit是10， offset是10
     // 也就是 第n页 就是 (n-1)*limit
-    let tag = query.tag;
     // 可以对比下时间
+    // 2.7s左右
     // const {
     //   data: { articles, articlesCount },
     // } = await articleList({
@@ -155,39 +199,60 @@ export default {
     //   data: { tags },
     // } = await getTags();
 
+    // 1.6s左右
+    // 区分是获取我关注的人写的文章还是全部文章
+    const loadArticle = tab === 'my_feed' ? articleFeedList : articleList
     const [articleListResult, getTagsResult] = await Promise.all([
-      articleList({
+      loadArticle({
         limit,
         offset,
-        tag,
+        tag
       }),
-      getTags(),
-    ]);
+      getTags()
+    ])
+    // 解构promise.all的结果
     const {
-      data: { articles, articlesCount },
-    } = articleListResult;
+      data: { articles, articlesCount }
+    } = articleListResult
     const {
-      data: { tags },
-    } = getTagsResult;
-    const tagsResult = tags.filter((tag) => !!tag);
+      data: { tags }
+    } = getTagsResult
+    //--
+    const tagsResult = tags.filter(tag => !!tag)
     return {
       articles,
       articlesCount,
       limit,
       offset,
       tagsResult,
-    };
+      tag,
+      tab: tab || 'global_feed' // 在页面上使用
+    }
   },
-  watchQuery: ["page", "tag"], // 监听路由中query对象中的page。
+  watchQuery: ['page', 'tag', 'tab'], // 监听路由中query对象中的page。
   computed: {
-    ...mapState(["user"]),
-    pageData() {
-      let arr = [];
-      let num = Math.ceil(this.articlesCount / this.limit);
-      return num;
-    },
+    ...mapState(['user']),
+    pageData () {
+      let arr = []
+      let num = Math.ceil(this.articlesCount / this.limit)
+      return num
+    }
   },
-};
+  methods: {
+    async favorit (article) {
+      console.log(article, '....xxxx')
+      if (article.favorited) {
+        // 取消点赞
+        await favorite(article.slug)
+        article.favoritesCount -= 1
+      } else {
+        // 去点赞
+        await unfavorite(article.slug)
+        article.favoritesCount += 1
+      }
+      article.favorited = !article.favorited
+    }
+  }
+}
 </script>
-<style>
-</style>
+<style></style>

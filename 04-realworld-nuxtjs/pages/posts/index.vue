@@ -2,67 +2,18 @@
   <div class="article-page">
     <div class="banner">
       <div class="container">
-        <h1>How to build webapps that scale</h1>
-
-        <div class="article-meta">
-          <a href=""
-            ><img
-              src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
-          /></a>
-          <div class="info">
-            <a href="" class="author">Eric Simons</a>
-            <span class="date">January 20th</span>
-          </div>
-          <button class="btn btn-sm btn-outline-secondary">
-            <i class="ion-plus-round"></i>
-            &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-          </button>
-          &nbsp;&nbsp;
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="ion-heart"></i>
-            &nbsp; Favorite Post <span class="counter">(29)</span>
-          </button>
-        </div>
+        <h1>{{ article.title }}</h1>
+        <article-meta :article="article"></article-meta>
       </div>
     </div>
-
     <div class="container page">
       <div class="row article-content">
-        <div class="col-md-12">
-          <p>
-            Web development technologies have evolved at an incredible clip over
-            the past few years.
-          </p>
-          <h2 id="introducing-ionic">Introducing RealWorld.</h2>
-          <p>It's a great solution for learning how other frameworks work.</p>
-        </div>
+        <div class="col-md-12" v-html="article.body"></div>
       </div>
-
       <hr />
-
       <div class="article-actions">
-        <div class="article-meta">
-          <a href="profile.html"
-            ><img
-              src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
-          /></a>
-          <div class="info">
-            <a href="" class="author">Eric Simons</a>
-            <span class="date">January 20th</span>
-          </div>
-
-          <button class="btn btn-sm btn-outline-secondary">
-            <i class="ion-plus-round"></i>
-            &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-          </button>
-          &nbsp;
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="ion-heart"></i>
-            &nbsp; Favorite Post <span class="counter">(29)</span>
-          </button>
-        </div>
+        <article-meta :article="article"></article-meta>
       </div>
-
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
           <form class="card comment-form">
@@ -75,13 +26,12 @@
             </div>
             <div class="card-footer">
               <img
-                src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
+                src="http://i.imgur.com/Qr71crq.jpg"
                 class="comment-author-img"
               />
               <button class="btn btn-sm btn-primary">Post Comment</button>
             </div>
           </form>
-
           <div class="card">
             <div class="card-block">
               <p class="card-text">
@@ -92,8 +42,8 @@
             <div class="card-footer">
               <a href="" class="comment-author">
                 <img
-                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
-                  class="comment-author-img"
+                  src="http://i.imgur.com/Qr71crq.jpg"
+                  class="comment-authorimg"
                 />
               </a>
               &nbsp;
@@ -101,7 +51,6 @@
               <span class="date-posted">Dec 29th</span>
             </div>
           </div>
-
           <div class="card">
             <div class="card-block">
               <p class="card-text">
@@ -112,8 +61,8 @@
             <div class="card-footer">
               <a href="" class="comment-author">
                 <img
-                  src="//upload-images.jianshu.io/upload_images/5547112-12d6ef4701672453.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/896/format/webp"
-                  class="comment-author-img"
+                  src="http://i.imgur.com/Qr71crq.jpg"
+                  class="comment-authorimg"
                 />
               </a>
               &nbsp;
@@ -132,10 +81,29 @@
 </template>
 
 <script>
+import { getArticle } from '@/api/posts'
+import articleMeta from './components/article-meta'
+import MarkdownIt from 'markdown-it'
+
 export default {
-  name: 'postsIndex'
+  name: 'postsIndex',
+  async asyncData ({ params, redirect }) {
+    const { slug } = params
+    if (!slug) {
+      redirect('/')
+      return
+    }
+    const { data: { article } } = await getArticle(slug)
+    const md = new MarkdownIt()
+    article.body = md.render(article.body)
+    return {
+      article
+    }
+  },
+  components: {
+    articleMeta
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>
