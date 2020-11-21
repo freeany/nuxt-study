@@ -16,64 +16,7 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
-          <form class="card comment-form">
-            <div class="card-block">
-              <textarea
-                class="form-control"
-                placeholder="Write a comment..."
-                rows="3"
-              ></textarea>
-            </div>
-            <div class="card-footer">
-              <img
-                src="http://i.imgur.com/Qr71crq.jpg"
-                class="comment-author-img"
-              />
-              <button class="btn btn-sm btn-primary">Post Comment</button>
-            </div>
-          </form>
-          <div class="card">
-            <div class="card-block">
-              <p class="card-text">
-                With supporting text below as a natural lead-in to additional
-                content.
-              </p>
-            </div>
-            <div class="card-footer">
-              <a href="" class="comment-author">
-                <img
-                  src="http://i.imgur.com/Qr71crq.jpg"
-                  class="comment-authorimg"
-                />
-              </a>
-              &nbsp;
-              <a href="" class="comment-author">Jacob Schmidt</a>
-              <span class="date-posted">Dec 29th</span>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-block">
-              <p class="card-text">
-                With supporting text below as a natural lead-in to additional
-                content.
-              </p>
-            </div>
-            <div class="card-footer">
-              <a href="" class="comment-author">
-                <img
-                  src="http://i.imgur.com/Qr71crq.jpg"
-                  class="comment-authorimg"
-                />
-              </a>
-              &nbsp;
-              <a href="" class="comment-author">Jacob Schmidt</a>
-              <span class="date-posted">Dec 29th</span>
-              <span class="mod-options">
-                <i class="ion-edit"></i>
-                <i class="ion-trash-a"></i>
-              </span>
-            </div>
-          </div>
+          <article-comment :article="article"></article-comment>
         </div>
       </div>
     </div>
@@ -81,29 +24,42 @@
 </template>
 
 <script>
-import { getArticle } from '@/api/posts'
-import articleMeta from './components/article-meta'
-import MarkdownIt from 'markdown-it'
+import { getArticle } from "@/api/posts";
+import articleMeta from "./components/article-meta";
+import MarkdownIt from "markdown-it";
+import ArticleComment from './components/article-comment.vue';
 
 export default {
-  name: 'postsIndex',
-  async asyncData ({ params, redirect }) {
-    const { slug } = params
+  name: "postsIndex",
+  async asyncData({ params, redirect }) {
+    const { slug } = params;
     if (!slug) {
-      redirect('/')
-      return
+      redirect("/");
+      return;
     }
-    const { data: { article } } = await getArticle(slug)
-    const md = new MarkdownIt()
-    article.body = md.render(article.body)
+    const {
+      data: { article },
+    } = await getArticle(slug);
+    const md = new MarkdownIt();
+    article.body = md.render(article.body);
     return {
-      article
-    }
+      article,
+    };
   },
   components: {
-    articleMeta
-  }
-}
+    articleMeta,
+    ArticleComment
+  },
+  // 给个性化页面设置head。
+  head() {
+    return {
+      title: `${this.article.title} -- RealWorld`,
+      meta: [
+        {hid: 'description', name: 'description', content: this.article.description}
+      ]
+    }
+  },
+};
 </script>
 
 <style></style>
